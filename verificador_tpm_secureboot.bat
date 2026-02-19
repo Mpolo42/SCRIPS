@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 >nul
 echo ============================================
-echo  Verificando TPM 2.0 e Secure Boot
+echo  Verificando TPM 2.0, Secure Boot e Certificado 2026
 echo ============================================
 echo.
 
@@ -27,6 +27,15 @@ if /i "%SECUREBOOT%"=="True" (
     echo [OK] Secure Boot Ativo
 ) else (
     echo [FALHA] Secure Boot Desativado ou Nao Suportado
+)
+
+:: Verifica a CA 2023 
+for /f "tokens=*" %%a in ('powershell -command "([System.Text.Encoding]::ASCII.GetString((Get-SecureBootUEFI db).bytes) -match 'Windows UEFI CA 2023')"') do set CA2023=%%a
+
+if /i "%CA2023%"=="True" (
+    echo [OK] Windows UEFI CA 2023 Detectada
+) else (
+    echo [AVISO] Windows UEFI CA 2023 nao encontrada - Requer atualizacao de DBX/DB
 )
 
 echo.
